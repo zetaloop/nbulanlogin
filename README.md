@@ -1,5 +1,5 @@
 ## NBU LAN Login 宁大宽带登录器
-<p><img src="https://github.com/zetaloop/nbulanlogin/assets/36418285/6c9c66d8-adda-4714-b34a-fa0adbaf80ec" width="250"/>　　<img src="https://github.com/zetaloop/nbulanlogin/assets/36418285/4261ef26-dbd7-4946-86bc-784ca58f85e9" width="250"/></p>
+![image](https://github.com/zetaloop/nbulanlogin/assets/36418285/5babd37b-179f-4c2d-aa00-76566be1866d)
 
 ## 功能
 
@@ -14,7 +14,7 @@
 
 *Windows 可下载已打包的 exe，其他系统运行原脚本或自行打包*
 
-v2.2 20230914 [GitHub Releases](https://github.com/zetaloop/nbulanlogin/releases/latest)
+v2.3 20230914 [GitHub Releases](https://github.com/zetaloop/nbulanlogin/releases/latest)
 
 ## 直接使用源码
 
