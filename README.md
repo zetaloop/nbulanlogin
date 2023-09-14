@@ -1,5 +1,6 @@
 ## NBU LAN Login 宁大宽带登录器
-![image](https://github.com/zetaloop/nbulanlogin/assets/36418285/5babd37b-179f-4c2d-aa00-76566be1866d)
+
+![image](https://github.com/zetaloop/nbulanlogin/assets/36418285/219ae4c3-e997-49a5-aab7-6500e955ebdc)
 
 ## 功能
 
