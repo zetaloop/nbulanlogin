@@ -23,8 +23,10 @@ xstr = _xstr_factory()
 
 def getstate():
     '''获取当前网关状态'''
+    session = requests.Session()
+    session.trust_env = False
     try:
-        data = requests.get('http://10.36.100.2:8181/', timeout=timeout, headers={'Accept-Encoding':''}).text
+        data = session.get('http://10.36.100.2:8181/', timeout=timeout, headers={'Accept-Encoding':''}).text
     except:
         return 'NetworkError'
     if '登录成功' in data[:256]:
@@ -36,6 +38,8 @@ def getstate():
 
 def login(url, acc, pswd):
     '''进行登录操作'''
+    session = requests.Session()
+    session.trust_env = False
     loginurl = 'http://10.36.100.2:8181/eportal/InterFace.do?method=login'
     headers={
     'Accept':'*/*',
@@ -51,7 +55,7 @@ def login(url, acc, pswd):
     data = f'userId={acc}&password={pswd}'
     data += f'&service=&queryString={queryString}'
     data += '&operatorPwd=&operatorUserId=&validcode=&passwordEncrypt=false'
-    resp = requests.post(loginurl, headers=headers, data=data, timeout=timeout)
+    resp = session.post(loginurl, headers=headers, data=data, timeout=timeout)
     resp.encoding = 'utf-8'
     result = json.loads(resp.text)
     if result['result'] == 'success':
@@ -61,8 +65,10 @@ def login(url, acc, pswd):
 
 def logout():
     '''进行退出操作'''
+    session = requests.Session()
+    session.trust_env = False
     logouturl = 'http://10.36.100.2:8181/eportal/InterFace.do?method=logout'
-    resp = requests.get(logouturl, timeout=timeout)
+    resp = session.get(logouturl, timeout=timeout)
     resp.encoding = 'utf-8'
     result = json.loads(resp.text)
     if result['result'] == 'success':

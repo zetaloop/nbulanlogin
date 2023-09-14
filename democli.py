@@ -1,10 +1,7 @@
 from core import getstate, login, logout
-import proxy
 
 username = "NAME"
 password = "PSWD"
-
-proxy.disable()
 
 state = getstate()
 match state:
@@ -23,5 +20,3 @@ match state:
         print(f'数据异常: {state.more[:400]}')
     case 'NetworkError':
         print('网络连接失败')
-
-proxy.restore()

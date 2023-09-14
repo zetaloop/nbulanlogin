@@ -1,13 +1,11 @@
-import os, webbrowser
+import os, sys, webbrowser
 from core import getstate, login, logout
 from config import get, set
-import proxy
 from version import vertxt
 
 def update_state():
     status_var.set('正在查询状态')
     root.update()
-    proxy.disable()
     msg = {
         'Connected': '已登录',
         'Login': '未登录',
@@ -18,12 +16,10 @@ def update_state():
     status_var.set(sta)
     if sta == '未登录' and get('autologin'):
         login_btn()
-    proxy.restore()
 
 def login_btn():
     status_var.set('正在登录')
     root.update()
-    proxy.disable()
     url = getstate()
     match url:
         case 'Login':
@@ -39,12 +35,10 @@ def login_btn():
         case 'NetworkError':
             sta = '登录失败：连不上服务器'
     status_var.set(sta)
-    proxy.restore()
 
 def logout_btn():
     status_var.set('正在退出')
     root.update()
-    proxy.disable()
     url = getstate()
     match url:
         case 'Connected':
@@ -60,7 +54,6 @@ def logout_btn():
         case 'NetworkError':
             sta = '退出失败：连不上服务器'
     status_var.set(sta)
-    proxy.restore()
 
 def settings_btn():
     import tkinter as tk
@@ -80,7 +73,7 @@ def settings_btn():
     frm.pack(padx=10, pady=5, fill='x', expand=True)
 
     ttk.Label(settings, justify='center', text=f'宁大宽带登录器 NBU LAN Login {vertxt}').pack(pady=5, padx=20)
-    ttk.Label(settings, justify='center', text='让寝室宽带使用更加高效', style='small.TLabel').pack(pady=5, padx=20)
+    ttk.Label(settings, justify='center', text='让宿舍宽带使用更加高效', style='small.TLabel').pack(pady=5, padx=20)
     ttk.Label(settings, justify='center', text='Designed by Zetaloop', style='small.TLabel').pack(pady=5, padx=20)
     ttk.Label(settings, justify='center', text='github.com/zetaloop/nbulanlogin', style='verysmall.TLabel').pack(pady=5, padx=20)
 
@@ -91,18 +84,15 @@ def settings_btn():
     # 创建变量来存储复选框的状态
     autostart_var = tk.BooleanVar(value=get('autostart'))
     autologin_var = tk.BooleanVar(value=get('autologin'))
-    disableproxy_var = tk.BooleanVar(value=get('disableproxy'))
     autostart_var.trace_add('write', autosave('autostart', autostart_var))
+    autostart_var.trace_add('write', lambda *_:root.after(0, update_startup))
     autologin_var.trace_add('write', autosave('autologin', autologin_var))
-    disableproxy_var.trace_add('write', autosave('disableproxy', disableproxy_var))
 
     # 创建复选框
     autostart_cb = ttk.Checkbutton(frm, text="开机启动", variable=autostart_var)
     autologin_cb = ttk.Checkbutton(frm, text="自动登录", variable=autologin_var)
-    disableproxy_cb = ttk.Checkbutton(frm, text="自动关闭代理", variable=disableproxy_var)
     autostart_cb.grid(row=0, column=0, padx=5, pady=5, sticky="w")
     autologin_cb.grid(row=1, column=0, padx=5, pady=5, sticky="w")
-    disableproxy_cb.grid(row=2, column=0, padx=5, pady=5, sticky="w")
 
     # 创建按钮
     frm = ttk.Frame(settings)
@@ -127,13 +117,56 @@ def settings_btn():
     # 修复按钮状态，只有deiconify后延时去除alternate状态才是有效的
     root.after(0, lambda:autostart_cb.state(['!alternate']))
     root.after(0, lambda:autologin_cb.state(['!alternate']))
-    root.after(0, lambda:disableproxy_cb.state(['!alternate']))
 
 def origlogin_btn():
     webbrowser.open('http://10.36.100.2:8181/')
 
 def origmanage_btn():
     webbrowser.open('http://10.36.100.1:8080/')
+
+def update_startup():
+    sysname = sys.platform.replace('win32', 'windows').replace('darwin', 'macos')
+    if get('autostart'):
+        if sysname == 'windows':  # 将自身快捷方式放入开机自启文件夹
+            set_startup_win()
+        else:
+            from tkinter import messagebox
+            messagebox.showwarning("开机自启暂不支持",
+                "自动设置开机自启目前仅支持 Windows 系统，"
+                f"当前系统 {sysname} 暂不支持，"
+                "请自行寻找设置开机自启的方法")
+    else:
+        if sysname == 'windows':
+            del_startup_win()
+        else:
+            pass
+
+def set_startup_win():
+    # 获取自身路径
+    if getattr(sys, 'frozen', False):
+        target_path = sys.executable
+    else:
+        target_path = os.path.abspath(__file__)
+    # 定义快捷方式路径
+    startup_path = os.getenv('APPDATA') + r'\Microsoft\Windows\Start Menu\Programs\Startup'
+    shortcut_path = os.path.join(startup_path, 'NBU LAN Login.lnk')
+    if os.path.exists(shortcut_path):
+        os.remove(shortcut_path)
+    # 创建快捷方式
+    from win32com.client import Dispatch
+    shortcut = Dispatch("WScript.Shell").CreateShortCut(shortcut_path)
+    shortcut.Targetpath = target_path
+    shortcut.WorkingDirectory = os.path.dirname(target_path)
+    shortcut.Description = '宁大宽带登录器'
+    shortcut.save()
+    status_var.set('开机自启已保存')
+
+def del_startup_win():
+    startup_path = os.getenv('APPDATA') + r'\Microsoft\Windows\Start Menu\Programs\Startup'
+    shortcut_path = os.path.join(startup_path, 'NBU LAN Login.lnk')
+    if os.path.exists(shortcut_path):
+        os.remove(shortcut_path)
+    status_var.set('开机自启已删除')
 
 def autosave(name, var):
     def callback(*_):

@@ -8,7 +8,6 @@ default = {
     'password': '',
     'autostart': False,
     'autologin': False,
-    'disableproxy': False,
 }
 
 def get(name):
