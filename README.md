@@ -18,6 +18,14 @@
 
 v2.2 20230914 [GitHub Releases](https://github.com/zetaloop/nbulanlogin/releases/latest)
 
+## 直接使用源码
+
+### Requirements: 
+```
+pip install -U requests sv_ttk pywin32
+```
+然后运行 `LANLogin.py` 打开主界面
+
 ## 技术细节
 
 UI: tkinter, sv-ttk
