@@ -1,7 +1,5 @@
 ## NBU LAN Login 宁大宽带登录器
-
-<p><img src="https://github.com/zetaloop/nbulanlogin/assets/36418285/6c9c66d8-adda-4714-b34a-fa0adbaf80ec" width="250"/></p>
-<p><img src="https://github.com/zetaloop/nbulanlogin/assets/36418285/4261ef26-dbd7-4946-86bc-784ca58f85e9" width="250"/></p>
+<p><img src="https://github.com/zetaloop/nbulanlogin/assets/36418285/6c9c66d8-adda-4714-b34a-fa0adbaf80ec" width="250"/>　　<img src="https://github.com/zetaloop/nbulanlogin/assets/36418285/4261ef26-dbd7-4946-86bc-784ca58f85e9" width="250"/></p>
 
 ## 功能
 
@@ -22,7 +20,11 @@ v2.2 20230914 [GitHub Releases](https://github.com/zetaloop/nbulanlogin/releases
 
 ### Requirements: 
 ```
-pip install -U requests sv_ttk pywin32
+pip install -U requests sv_ttk
+# 若在 windows 上运行：
+pip install -U pywin32
+# 若需要打包：
+pip install -U pyinstaller
 ```
 然后运行 `LANLogin.py` 打开主界面
 
