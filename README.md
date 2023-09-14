@@ -12,7 +12,7 @@
 
 ## 下载
 
-*Windows 有 exe 打包，其他系统自行运行原脚本*
+*Windows 可下载已打包的 exe，其他系统运行原脚本或自行打包*
 
 v2.2 20230914 [GitHub Releases](https://github.com/zetaloop/nbulanlogin/releases/latest)
 
