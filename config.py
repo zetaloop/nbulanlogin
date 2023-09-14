@@ -1,7 +1,12 @@
 import os
+import sys
 import json
 
-config_path = os.path.join(os.path.dirname(__file__), 'config.json')
+if getattr(sys, 'frozen', False):
+    path = sys.executable
+else:
+    path = os.path.abspath(__file__)
+config_path = os.path.join(os.path.dirname(path), 'config.json')
 
 default = {
     'username': '',

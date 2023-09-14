@@ -99,6 +99,7 @@ def settings_btn():
     frm.pack(padx=20, pady=0, fill='x', expand=True)
     ttk.Button(frm, text="宽带登录页面", command=origlogin_btn).grid(row=0, column=0, padx=10, pady=5, sticky='ew')
     ttk.Button(frm, text="宽带管理页面", command=origmanage_btn).grid(row=0, column=1, padx=10, pady=5, sticky='ew')
+    ttk.Button(frm, text="关闭", command=settings.destroy, style="Accent.TButton").grid(row=1, column=0, columnspan=2, padx=10, pady=(10, 5), sticky='ew')
     frm.grid_columnconfigure(0, weight=1)
     frm.grid_columnconfigure(1, weight=1)
 
@@ -251,4 +252,3 @@ def ui():
 
 if __name__ == '__main__':
     ui()
-    exit()
