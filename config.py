@@ -13,6 +13,8 @@ default = {
     'password': '',
     'autostart': False,
     'autologin': False,
+    'autorefresh': False,
+    'refreshtime': '12',
 }
 
 def get(name):

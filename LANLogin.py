@@ -82,17 +82,33 @@ def settings_btn():
     frm.pack(padx=20, pady=10, fill="x", expand=True)
 
     # 创建变量来存储复选框的状态
+    global autostart_var, autologin_var, autorefresh_var, refreshtime_var
     autostart_var = tk.BooleanVar(value=get('autostart'))
     autologin_var = tk.BooleanVar(value=get('autologin'))
+    autorefresh_var = tk.BooleanVar(value=get('autorefresh'))
+    refreshtime_var = tk.StringVar(value=get('refreshtime'))
     autostart_var.trace_add('write', autosave('autostart', autostart_var))
-    autostart_var.trace_add('write', lambda *_:root.after(0, update_startup))
+    autostart_var.trace_add('write', lambda *_:root.after(0, set_startup))
     autologin_var.trace_add('write', autosave('autologin', autologin_var))
+    autorefresh_var.trace_add('write', autosave('autorefresh', autorefresh_var))
+    autorefresh_var.trace_add('write', lambda *_:root.after(0, set_refresh))
+    refreshtime_var.trace_add('write', autosave('refreshtime', refreshtime_var))
+    refreshtime_var.trace_add('write', lambda *_:root.after(0, lambda: set_refresh(0)))
 
     # 创建复选框
     autostart_cb = ttk.Checkbutton(frm, text="开机启动", variable=autostart_var)
     autologin_cb = ttk.Checkbutton(frm, text="自动登录", variable=autologin_var)
+    autorefresh_cb = ttk.Checkbutton(frm, text="定时检查", variable=autorefresh_var)
+    refreshtime_frm = ttk.Frame(frm)
+    refreshtime_validator = settings.register(lambda P: P == "" or P.isdigit())
+    # ttk.Label(refreshtime_frm, text="间隔").grid(row=0, column=0, padx=5, pady=0, sticky="w")
+    ttk.Entry(refreshtime_frm, textvariable=refreshtime_var, width=4, validate='key',
+                validatecommand=(refreshtime_validator, '%P')).grid(row=0, column=1, padx=5, pady=0, sticky="w")
+    ttk.Label(refreshtime_frm, text="h").grid(row=0, column=2, padx=5, pady=0, sticky="w")
     autostart_cb.grid(row=0, column=0, padx=5, pady=5, sticky="w")
     autologin_cb.grid(row=1, column=0, padx=5, pady=5, sticky="w")
+    autorefresh_cb.grid(row=2, column=0, padx=5, pady=5, sticky="w")
+    refreshtime_frm.grid(row=2, column=1, padx=5, pady=5, sticky="e")
 
     # 创建按钮
     frm = ttk.Frame(settings)
@@ -125,7 +141,7 @@ def origlogin_btn():
 def origmanage_btn():
     webbrowser.open('http://10.36.100.1:8080/')
 
-def update_startup():
+def set_startup():
     sysname = sys.platform.replace('win32', 'windows').replace('darwin', 'macos')
     if get('autostart'):
         if sysname == 'windows':  # 将自身快捷方式放入开机自启文件夹
@@ -139,8 +155,6 @@ def update_startup():
     else:
         if sysname == 'windows':
             del_startup_win()
-        else:
-            pass
 
 def set_startup_win():
     # 获取自身路径
@@ -160,14 +174,30 @@ def set_startup_win():
     shortcut.WorkingDirectory = os.path.dirname(target_path)
     shortcut.Description = '宁大宽带登录器'
     shortcut.save()
-    status_var.set('开机自启已保存')
+    status_var.set('开机自启已保存到系统')
 
 def del_startup_win():
     startup_path = os.getenv('APPDATA') + r'\Microsoft\Windows\Start Menu\Programs\Startup'
     shortcut_path = os.path.join(startup_path, 'NBU LAN Login.lnk')
     if os.path.exists(shortcut_path):
         os.remove(shortcut_path)
-    status_var.set('开机自启已删除')
+    status_var.set('开机自启已从系统删除')
+
+refresh_tasks = []
+def set_refresh(update=True):
+    if update and get('autorefresh'): update_state()
+    while refresh_tasks:
+        try: root.after_cancel(refresh_tasks.pop())
+        except: pass
+    if update and get('autorefresh'):
+        hours = get('refreshtime')
+        if hours.isdigit():
+            hours = int(hours)
+        else:
+            hours = 0
+            refreshtime_var.set('0')
+        if hours > 0:
+            root.after(hours * 60 * 60 * 1000, set_refresh)
 
 def autosave(name, var):
     def callback(*_):
