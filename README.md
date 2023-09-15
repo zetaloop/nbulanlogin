@@ -1,6 +1,6 @@
 ## NBU LAN Login 宁大宽带登录器
 
-![image](https://github.com/zetaloop/nbulanlogin/assets/36418285/219ae4c3-e997-49a5-aab7-6500e955ebdc)
+![image](https://github.com/zetaloop/nbulanlogin/assets/36418285/f65101e2-e14d-4e69-87d2-5f3d36a3104c)
 
 ## 功能
 
@@ -8,6 +8,7 @@
 - 记住账号密码
 - 开机启动（仅 Windows）
 - 未登录时自动登录
+- 定时检查是否掉线
 - 忽略全局代理
 - 主体功能跨平台
 
@@ -15,7 +16,7 @@
 
 *Windows 可下载已打包的 exe，其他系统运行原脚本或自行打包*
 
-v2.3 20230914 [GitHub Releases](https://github.com/zetaloop/nbulanlogin/releases/latest)
+v2.4 20230915 [GitHub Releases](https://github.com/zetaloop/nbulanlogin/releases/latest)
 
 ## 直接使用源码
 
