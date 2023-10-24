@@ -1,7 +1,7 @@
 ver = [2, 4]
-vertxt = 'v' + '.'.join(map(str, ver))
+vertxt = "v" + ".".join(map(str, ver))
 
-'''
+"""
 VERSION LOG
 
 1.x 20230912:
@@ -38,4 +38,4 @@ VERSION LOG
 2.4 20230915
     增加定时检查功能
 
-'''
+"""
