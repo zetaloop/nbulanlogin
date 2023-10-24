@@ -8,7 +8,8 @@
 - 记住账号密码
 - 开机启动（仅 Windows）
 - 未登录时自动登录
-- 定时检查是否掉线
+- 定时退出重新登录
+- 命令行调用
 - 忽略全局代理
 - 主体功能跨平台
 
@@ -16,7 +17,7 @@
 
 *Windows 可下载已打包的 exe，其他系统运行原脚本或自行打包*
 
-v2.4 20230915 [GitHub Releases](https://github.com/zetaloop/nbulanlogin/releases/latest)
+v2.5 20231025 [GitHub Releases](https://github.com/zetaloop/nbulanlogin/releases/latest)
 
 ## 直接使用源码
 
