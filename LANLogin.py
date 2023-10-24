@@ -31,7 +31,7 @@ def login_btn():
             else:
                 sta = f"登录失败：{result.more}"
         case "Connected":
-            sta = "登录失败：不能重复登录"
+            sta = "登录已经完成：无需重复登录"
         case "Unknown":
             sta = "登录失败：未知服务器状态"
         case "NetworkError":
@@ -51,7 +51,7 @@ def logout_btn():
             else:
                 sta = f"退出失败：{result.more}"
         case "Login":
-            sta = "退出失败：不能重复退出"
+            sta = "退出已经完成：无需重复退出"
         case "Unknown":
             sta = "退出失败：未知服务器状态"
         case "NetworkError":
@@ -113,7 +113,7 @@ def settings_btn():
     # 创建复选框
     autostart_cb = ttk.Checkbutton(frm, text="开机启动", variable=autostart_var)
     autologin_cb = ttk.Checkbutton(frm, text="自动登录", variable=autologin_var)
-    autorefresh_cb = ttk.Checkbutton(frm, text="定时检查", variable=autorefresh_var)
+    autorefresh_cb = ttk.Checkbutton(frm, text="定时重登", variable=autorefresh_var)
     refreshtime_frm = ttk.Frame(frm)
     refreshtime_validator = settings.register(lambda P: P == "" or P.isdigit())
     # ttk.Label(refreshtime_frm, text="间隔").grid(row=0, column=0, padx=5, pady=0, sticky="w")
@@ -165,10 +165,12 @@ def settings_btn():
 
 
 def origlogin_btn():
+    """打开原版登录网页"""
     webbrowser.open("http://10.36.100.2:8181/")
 
 
 def origmanage_btn():
+    """打开原版管理网页"""
     webbrowser.open("http://10.36.100.1:8080/")
 
 
@@ -228,7 +230,10 @@ refresh_tasks = []
 
 def set_refresh(update=True):
     if update and get("autorefresh"):
-        update_state()
+        logout_btn()
+        root.update()
+        login_btn()
+        root.update()
     while refresh_tasks:
         try:
             root.after_cancel(refresh_tasks.pop())
@@ -271,6 +276,20 @@ def ui():
     root.bind("<Escape>", lambda e: root.destroy())
     root.bind("<Control-r>", lambda e: update_state())
     sv_ttk.set_theme("light")
+
+    if __name__ == "__main__" and len(sys.argv) > 1:  # 支持命令行参数登录和退出
+        if sys.argv[1] == "help":
+            print("USAGE: lanlogin.exe [login/logout]")
+            sys.exit()
+        elif sys.argv[1] == "login":
+            root.after(300, login_btn)
+            root.after(2000, root.destroy)
+        elif sys.argv[1] == "logout":
+            root.after(300, logout_btn)
+            root.after(2000, root.destroy)
+        else:
+            print("Invalid command line argument")
+            sys.exit()
 
     # 设置字体
     style = ttk.Style()
