@@ -234,11 +234,12 @@ def set_refresh(update=True):
         root.update()
         login_btn()
         root.update()
-    while refresh_tasks:
-        try:
-            root.after_cancel(refresh_tasks.pop())
-        except:
-            pass
+    if not get("autorefresh"):
+        while refresh_tasks:
+            try:
+                root.after_cancel(refresh_tasks.pop())
+            except:
+                pass
     if update and get("autorefresh"):
         hours = get("refreshtime")
         if hours.isdigit():
@@ -247,7 +248,8 @@ def set_refresh(update=True):
             hours = 0
             refreshtime_var.set("0")
         if hours > 0:
-            root.after(hours * 60 * 60 * 1000, set_refresh)
+            ms = hours * 60 * 60 * 1000
+            root.after(ms, set_refresh)
 
 
 def autosave(name, var):
