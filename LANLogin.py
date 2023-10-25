@@ -279,7 +279,8 @@ def ui():
     root.bind("<Control-r>", lambda e: update_state())
     sv_ttk.set_theme("light")
 
-    if __name__ == "__main__" and len(sys.argv) > 1:  # 支持命令行参数登录和退出
+    # 支持命令行参数登录和退出
+    if __name__ == "__main__" and len(sys.argv) > 1:
         if sys.argv[1] == "help":
             print("USAGE: lanlogin.exe [login/logout]")
             sys.exit()
@@ -351,6 +352,7 @@ def ui():
     status_bar.pack(fill="x", padx=25, pady=20)
     status_bar.bind("<Button-1>", lambda e: update_state())
     root.after(0, update_state)
+    root.after(0, lambda: set_refresh(False))
 
     # 启动窗口
     root.update()
