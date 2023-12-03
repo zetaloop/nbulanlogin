@@ -1,4 +1,4 @@
-import os, sys, webbrowser
+import os, sys, time, webbrowser
 from core import getstate, login, logout
 from config import get, set
 from version import vertxt
@@ -106,9 +106,9 @@ def settings_btn():
     autostart_var.trace_add("write", lambda *_: root.after(0, set_startup))
     autologin_var.trace_add("write", autosave("autologin", autologin_var))
     autorefresh_var.trace_add("write", autosave("autorefresh", autorefresh_var))
-    autorefresh_var.trace_add("write", lambda *_: root.after(0, set_refresh))
+    autorefresh_var.trace_add("write", lambda *_: root.after(0, set_refresh(True)))
     refreshtime_var.trace_add("write", autosave("refreshtime", refreshtime_var))
-    refreshtime_var.trace_add("write", lambda *_: root.after(0, lambda: set_refresh(0)))
+    refreshtime_var.trace_add("write", lambda *_: root.after(0, set_refresh))
 
     # 创建复选框
     autostart_cb = ttk.Checkbutton(frm, text="开机启动", variable=autostart_var)
@@ -225,22 +225,17 @@ def del_startup_win():
     status_var.set("开机自启已从系统删除")
 
 
-refresh_tasks = []
+nexttime = -1
 
 
-def set_refresh(update=True):
-    if update and get("autorefresh"):
-        logout_btn()
-        root.update()
-        login_btn()
-        root.update()
-    if not get("autorefresh"):
-        while refresh_tasks:
-            try:
-                root.after_cancel(refresh_tasks.pop())
-            except:
-                pass
-    if update and get("autorefresh"):
+def set_refresh(mod=False, runnow=False):
+    if mod == True:
+        return lambda *_: set_refresh(runnow=True)
+
+    global nexttime
+    nexttime = -1
+    currenttime = time.time()
+    if get("autorefresh"):
         hours = get("refreshtime")
         if hours.isdigit():
             hours = int(hours)
@@ -248,8 +243,37 @@ def set_refresh(update=True):
             hours = 0
             refreshtime_var.set("0")
         if hours > 0:
-            ms = hours * 60 * 60 * 1000
-            root.after(ms, set_refresh)
+            nexttime = currenttime + hours * 60 * 60
+            if runnow:
+                root.after(0, lambda *_: run_refresh(force=runnow))
+            else:
+                root.after(0, run_refresh)
+
+
+def run_refresh(force=False):
+    global nexttime
+    currenttime = time.time()
+    if get("autorefresh") and nexttime != -1:
+        if currenttime >= nexttime or force:
+            logout_btn()
+            root.update()
+            login_btn()
+            root.update()
+            nexttime = currenttime + int(get("refreshtime")) * 60 * 60
+        sta = status_var.get()
+        if "[" in sta:
+            sta = sta[: sta.index("[")].rstrip()
+        rest = nexttime - currenttime
+        rest = f"{rest // 3600:.0f}h{rest % 3600 // 60:.0f}m{rest % 60:.0f}s"
+        sta += f" [{rest}]"
+        status_var.set(sta)
+        root.update()
+        root.after(300, run_refresh)
+    else:
+        sta = status_var.get()
+        if "[" in sta:
+            sta = sta[: sta.index("[")].rstrip()
+        status_var.set(sta)
 
 
 def autosave(name, var):
@@ -352,7 +376,7 @@ def ui():
     status_bar.pack(fill="x", padx=25, pady=20)
     status_bar.bind("<Button-1>", lambda e: update_state())
     root.after(0, update_state)
-    root.after(0, lambda: set_refresh(False))
+    root.after(0, set_refresh)
 
     # 启动窗口
     root.update()
