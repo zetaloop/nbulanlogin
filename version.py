@@ -1,4 +1,4 @@
-ver = [2, 5]
+ver = [2, 7]
 vertxt = "v" + ".".join(map(str, ver))
 
 """
