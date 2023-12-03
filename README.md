@@ -17,7 +17,7 @@
 
 *Windows 可下载已打包的 exe，其他系统运行原脚本或自行打包*
 
-v2.5 20231025 [GitHub Releases](https://github.com/zetaloop/nbulanlogin/releases/latest)
+v2.7 20231203 [GitHub Releases](https://github.com/zetaloop/nbulanlogin/releases/latest)
 
 ## 直接使用源码
 
