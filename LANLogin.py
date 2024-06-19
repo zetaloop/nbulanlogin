@@ -36,6 +36,8 @@ def login_btn():
             sta = "登录失败：未知服务器状态"
         case "NetworkError":
             sta = "登录失败：连不上服务器"
+        case _:
+            assert False
     status_var.set(sta)
 
 
@@ -56,6 +58,8 @@ def logout_btn():
             sta = "退出失败：未知服务器状态"
         case "NetworkError":
             sta = "退出失败：连不上服务器"
+        case _:
+            assert False
     status_var.set(sta)
 
 
@@ -76,9 +80,9 @@ def settings_btn():
     frm = ttk.Frame(settings)
     frm.pack(padx=10, pady=5, fill="x", expand=True)
 
-    ttk.Label(settings, justify="center", text=f"宁大宽带登录器 NBU LAN Login {vertxt}").pack(
-        pady=5, padx=20
-    )
+    ttk.Label(
+        settings, justify="center", text=f"宁大宽带登录器 NBU LAN Login {vertxt}"
+    ).pack(pady=5, padx=20)
     ttk.Label(
         settings, justify="center", text="让宿舍宽带使用更加高效", style="small.TLabel"
     ).pack(pady=5, padx=20)
@@ -106,7 +110,7 @@ def settings_btn():
     autostart_var.trace_add("write", lambda *_: root.after(0, set_startup))
     autologin_var.trace_add("write", autosave("autologin", autologin_var))
     autorefresh_var.trace_add("write", autosave("autorefresh", autorefresh_var))
-    autorefresh_var.trace_add("write", lambda *_: root.after(0, set_refresh(True)))
+    autorefresh_var.trace_add("write", lambda *_: root.after(0, set_refresh(True)))  # type: ignore
     refreshtime_var.trace_add("write", autosave("refreshtime", refreshtime_var))
     refreshtime_var.trace_add("write", lambda *_: root.after(0, set_refresh))
 
@@ -184,7 +188,9 @@ def set_startup():
 
             messagebox.showwarning(
                 "开机自启暂不支持",
-                "自动设置开机自启目前仅支持 Windows 系统，" f"当前系统 {sysname} 暂不支持，" "请自行寻找设置开机自启的方法",
+                "自动设置开机自启目前仅支持 Windows 系统，"
+                f"当前系统 {sysname} 暂不支持，"
+                "请自行寻找设置开机自启的方法",
             )
     else:
         if sysname == "windows":
@@ -192,15 +198,16 @@ def set_startup():
 
 
 def set_startup_win():
+    # 获取环境变量
+    appdata = os.getenv("APPDATA")
+    assert appdata is not None
     # 获取自身路径
     if getattr(sys, "frozen", False):
         target_path = sys.executable
     else:
         target_path = os.path.abspath(__file__)
     # 定义快捷方式路径
-    startup_path = (
-        os.getenv("APPDATA") + r"\Microsoft\Windows\Start Menu\Programs\Startup"
-    )
+    startup_path = appdata + r"\Microsoft\Windows\Start Menu\Programs\Startup"
     shortcut_path = os.path.join(startup_path, "NBU LAN Login.lnk")
     if os.path.exists(shortcut_path):
         os.remove(shortcut_path)
@@ -216,9 +223,9 @@ def set_startup_win():
 
 
 def del_startup_win():
-    startup_path = (
-        os.getenv("APPDATA") + r"\Microsoft\Windows\Start Menu\Programs\Startup"
-    )
+    appdata = os.getenv("APPDATA")
+    assert appdata is not None
+    startup_path = appdata + r"\Microsoft\Windows\Start Menu\Programs\Startup"
     shortcut_path = os.path.join(startup_path, "NBU LAN Login.lnk")
     if os.path.exists(shortcut_path):
         os.remove(shortcut_path)
