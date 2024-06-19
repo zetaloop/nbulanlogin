@@ -266,6 +266,12 @@ def run_refresh(force=False):
             root.update()
             login_btn()
             root.update()
+            if getstate() != "Connected" and not force:
+                status_var.set("重登失败，3 秒后重试...")
+                root.after(1000, lambda: status_var.set("重登失败，2 秒后重试..."))
+                root.after(2000, lambda: status_var.set("重登失败，1 秒后重试..."))
+                root.after(3000, lambda: run_refresh(force=True))
+                return
             nexttime = currenttime + int(get("refreshtime")) * 60 * 60
         sta = status_var.get()
         if "[" in sta:
