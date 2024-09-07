@@ -12,7 +12,7 @@ def get_current_state():
             return True, None
         case "Login":
             print("[当前未登录]")
-            return False, state.more
+            return False, state.more  # data is login url
         case "Unknown":
             raise ValueError(f"数据异常: {state.more[:400]}")
         case "NetworkError":
