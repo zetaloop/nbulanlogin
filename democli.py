@@ -5,12 +5,28 @@ from core import getstate, login, logout
 
 
 def main():
-    parser = argparse.ArgumentParser(description="nbulogging")
+    parser = argparse.ArgumentParser(description="[== NBU LAN Login ==]")
     parser.add_argument(
-        "action", nargs="?", default="login", help="login(default) logout relogin"
+        "action",
+        nargs="?",
+        default="login",
+        choices=["login", "logout", "relogin"],
+        help="the action to perform (default: %(default)s)",
     )
-    parser.add_argument("--username", "-u", required=True, help="username")
-    parser.add_argument("--password", "-p", required=True, help="password")
+    parser.add_argument(
+        "-u",
+        "--username",
+        required=True,
+        metavar="MyName",
+        help="network account username",
+    )
+    parser.add_argument(
+        "-p",
+        "--password",
+        required=True,
+        metavar="aBc123",
+        help="network account password",
+    )
     args = parser.parse_args()
 
     if args.action == "logout":
