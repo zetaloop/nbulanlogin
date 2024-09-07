@@ -23,6 +23,7 @@
 
 import argparse
 import time
+import datetime
 from core import getstate, login, logout
 
 def main():
@@ -63,4 +64,5 @@ def perform_login(username, password):
             print("网络连接失败")
 
 if __name__ == "__main__":
-    main()
+	print(datetime.datetime.now().strftime('%Y-%m-%d  %H:%M:%S'))
+	main()
