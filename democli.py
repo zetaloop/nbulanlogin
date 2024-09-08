@@ -104,5 +104,5 @@ def main():
 
 
 if __name__ == "__main__":
-    print(datetime.datetime.now().strftime("%Y-%m-%d  %H:%M:%S"))
+    print("--- "+datetime.datetime.now().strftime("%Y-%m-%d  %H:%M:%S")+" ---")
     main()
