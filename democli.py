@@ -87,6 +87,8 @@ def main():
                 get_logout_result()
         case "relogin":
             online, url = get_current_state()
+            if args.username is None or args.password is None:
+                raise ValueError("无法登录: 请指定用户名和密码")
             if online:
                 get_logout_result()
                 online, url = get_current_state()
