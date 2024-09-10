@@ -17,7 +17,7 @@ python.exe -m pip install -U pip setuptools
 pip install -U requests sv_ttk pywin32 pyinstaller
 
 REM Run PyInstaller to build the project
-pyinstaller --onefile --windowed --icon=../lanlogin.ico --add-data "../lanlogin.ico;." --collect-data sv_ttk --distpath . --workpath build  ../LANLogin.py
+pyinstaller --onefile --icon=../lanlogin.ico --add-data "../lanlogin.ico;." --collect-data sv_ttk --distpath . --workpath build  ../LANLogin.py
 
 REM Remove the virtual environment, build, and PyInstaller bootloader directories
 if exist venv rmdir /s /q venv

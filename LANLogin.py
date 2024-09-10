@@ -5,6 +5,18 @@ from config import get, set
 from version import vertxt
 
 
+def win32_hide_console():
+    """隐藏命令行窗口"""
+    print("正在启动窗口，请稍等...")
+
+    import ctypes
+
+    hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+    if hwnd != 0:
+        ctypes.windll.user32.ShowWindow(hwnd, 0)
+        ctypes.windll.kernel32.CloseHandle(hwnd)
+
+
 def update_state():
     status_var.set("正在查询状态")
     root.update()
@@ -402,4 +414,6 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         cli()
     else:
+        if sys.platform == "win32":
+            win32_hide_console()
         ui()
