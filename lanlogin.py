@@ -1,21 +1,9 @@
 import os, sys, time, webbrowser
-import sysutils
 from core import getstate, login, logout
+from sysutils import hide_console, create_startup, remove_startup
 from cli import cli
 from config import get, set
 from version import vertxt
-
-
-def win32_hide_console():
-    """隐藏命令行窗口"""
-    print("正在启动窗口，请稍等...")
-
-    import ctypes
-
-    hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-    if hwnd != 0:
-        ctypes.windll.user32.ShowWindow(hwnd, 0)
-        ctypes.windll.kernel32.CloseHandle(hwnd)
 
 
 def update_state():
@@ -194,11 +182,11 @@ def origmanage_btn():
 
 def set_startup():
     if get("autostart"):
-        message = sysutils.set_startup()
+        message = create_startup()
         if message:
             status_var.set(message)
     else:
-        message = sysutils.del_startup()
+        message = remove_startup()
         if message:
             status_var.set(message)
 
@@ -372,6 +360,5 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         cli()
     else:
-        if sys.platform == "win32":
-            win32_hide_console()
+        hide_console()
         ui()

@@ -1,7 +1,19 @@
 import os, sys
 
 
-def win32_set_startup():
+def hide_console():
+    """隐藏命令行窗口"""
+    if sys.platform == "win32":
+        import ctypes
+
+        print("正在启动窗口，请稍等...")
+        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if hwnd != 0:
+            ctypes.windll.user32.ShowWindow(hwnd, 0)
+            ctypes.windll.kernel32.CloseHandle(hwnd)
+
+
+def win32_create_startup():
     # 获取环境变量
     appdata = os.getenv("APPDATA")
     assert appdata is not None
@@ -26,7 +38,7 @@ def win32_set_startup():
     return "已创建开机自启快捷方式"
 
 
-def win32_del_startup():
+def win32_remove_startup():
     appdata = os.getenv("APPDATA")
     assert appdata is not None
     startup_path = appdata + r"\Microsoft\Windows\Start Menu\Programs\Startup"
@@ -55,7 +67,7 @@ PLIST_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 """
 
 
-def darwin_set_startup():
+def darwin_create_startup():
     target_path = os.path.abspath(__file__)
     plist_path = os.path.expanduser(
         "~/Library/LaunchAgents/com.zetaloop.nbulanlogin.plist"
@@ -69,7 +81,7 @@ def darwin_set_startup():
     return "已创建 plist 开机自启文件"
 
 
-def darwin_del_startup():
+def darwin_remove_startup():
     plist_path = os.path.expanduser(
         "~/Library/LaunchAgents/com.zetaloop.nbulanlogin.plist"
     )
@@ -93,7 +105,7 @@ WantedBy=default.target
 """
 
 
-def linux_set_startup():
+def linux_create_startup():
     target_path = os.path.abspath(__file__)
     systemd_path = os.path.expanduser("~/.config/systemd/user/nbulanlogin.service")
     if os.path.exists(systemd_path):
@@ -106,7 +118,7 @@ def linux_set_startup():
     return "已创建 systemd 开机自启服务"
 
 
-def linux_del_startup():
+def linux_remove_startup():
     systemd_path = os.path.expanduser("~/.config/systemd/user/nbulanlogin.service")
     if os.path.exists(systemd_path):
         os.system(f"systemctl --user stop nbulanlogin.service")
@@ -117,7 +129,7 @@ def linux_del_startup():
         return "未找到 systemd 开机自启服务"
 
 
-def default_set_startup():
+def default_create_startup():
     from tkinter import messagebox  # type: ignore
 
     messagebox.showwarning(
@@ -127,20 +139,20 @@ def default_set_startup():
     return None
 
 
-def default_del_startup():
+def default_remove_startup():
     return None
 
 
 match sys.platform:
     case "win32":
-        set_startup = win32_set_startup
-        del_startup = win32_del_startup
+        create_startup = win32_create_startup
+        remove_startup = win32_remove_startup
     case "darwin":
-        set_startup = darwin_set_startup
-        del_startup = darwin_del_startup
+        create_startup = darwin_create_startup
+        remove_startup = darwin_remove_startup
     case "linux":
-        set_startup = linux_set_startup
-        del_startup = linux_del_startup
+        create_startup = linux_create_startup
+        remove_startup = linux_remove_startup
     case default:
-        set_startup = default_set_startup
-        del_startup = default_del_startup
+        create_startup = default_create_startup
+        remove_startup = default_remove_startup
