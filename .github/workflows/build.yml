@@ -1,0 +1,43 @@
+name: Build and Upload Artifacts
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Make build scripts executable (Linux/macOS)
+      if: runner.os != 'Windows'
+      run: chmod +x buildtools/build_macos.sh buildtools/build_linux.sh
+
+    - name: Run build script on Windows
+      if: runner.os == 'Windows'
+      run: buildtools\build_win.cmd
+
+    - name: Run build script on macOS
+      if: runner.os == 'macOS'
+      run: ./buildtools/build_macos.sh
+
+    - name: Run build script on Linux
+      if: runner.os == 'Linux'
+      run: ./buildtools/build_linux.sh
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: lanlogin-${{ runner.os }}
+        path: buildtools/lanlogin*
