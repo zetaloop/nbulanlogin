@@ -1,4 +1,5 @@
 import os, sys, time, webbrowser
+import sysutils
 from core import getstate, login, logout
 from cli import cli
 from config import get, set
@@ -192,57 +193,14 @@ def origmanage_btn():
 
 
 def set_startup():
-    sysname = sys.platform.replace("win32", "windows").replace("darwin", "macos")
     if get("autostart"):
-        if sysname == "windows":  # 将自身快捷方式放入开机自启文件夹
-            set_startup_win()
-        else:
-            from tkinter import messagebox
-
-            messagebox.showwarning(
-                "开机自启暂不支持",
-                "自动设置开机自启目前仅支持 Windows 系统，"
-                f"当前系统 {sysname} 暂不支持，"
-                "请自行寻找设置开机自启的方法",
-            )
+        message = sysutils.set_startup()
+        if message:
+            status_var.set(message)
     else:
-        if sysname == "windows":
-            del_startup_win()
-
-
-def set_startup_win():
-    # 获取环境变量
-    appdata = os.getenv("APPDATA")
-    assert appdata is not None
-    # 获取自身路径
-    if getattr(sys, "frozen", False):
-        target_path = sys.executable
-    else:
-        target_path = os.path.abspath(__file__)
-    # 定义快捷方式路径
-    startup_path = appdata + r"\Microsoft\Windows\Start Menu\Programs\Startup"
-    shortcut_path = os.path.join(startup_path, "NBU LAN Login.lnk")
-    if os.path.exists(shortcut_path):
-        os.remove(shortcut_path)
-    # 创建快捷方式
-    from win32com.client import Dispatch
-
-    shortcut = Dispatch("WScript.Shell").CreateShortCut(shortcut_path)
-    shortcut.Targetpath = target_path
-    shortcut.WorkingDirectory = os.path.dirname(target_path)
-    shortcut.Description = "宁大宽带登录器"
-    shortcut.save()
-    status_var.set("开机自启已保存到系统")
-
-
-def del_startup_win():
-    appdata = os.getenv("APPDATA")
-    assert appdata is not None
-    startup_path = appdata + r"\Microsoft\Windows\Start Menu\Programs\Startup"
-    shortcut_path = os.path.join(startup_path, "NBU LAN Login.lnk")
-    if os.path.exists(shortcut_path):
-        os.remove(shortcut_path)
-    status_var.set("开机自启已从系统删除")
+        message = sysutils.del_startup()
+        if message:
+            status_var.set(message)
 
 
 nexttime = -1
