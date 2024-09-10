@@ -1,5 +1,6 @@
 import os, sys, time, webbrowser
 from core import getstate, login, logout
+from cli import cli
 from config import get, set
 from version import vertxt
 
@@ -398,4 +399,7 @@ def ui():
 
 
 if __name__ == "__main__":
-    ui()
+    if len(sys.argv) > 1:
+        cli()
+    else:
+        ui()

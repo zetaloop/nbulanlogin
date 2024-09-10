@@ -51,7 +51,8 @@ def get_logout_result():
             assert False
 
 
-def main():
+def cli():
+    print("--- " + datetime.datetime.now().strftime("%Y-%m-%d  %H:%M:%S") + " ---")
     parser = argparse.ArgumentParser(description="[== NBU LAN Login ==]")
     parser.add_argument(
         "action",
@@ -104,5 +105,4 @@ def main():
 
 
 if __name__ == "__main__":
-    print("--- "+datetime.datetime.now().strftime("%Y-%m-%d  %H:%M:%S")+" ---")
-    main()
+    cli()
