@@ -282,21 +282,6 @@ def ui():
     root.bind("<Control-r>", lambda e: update_state())
     sv_ttk.set_theme("light")
 
-    # 支持命令行参数登录和退出
-    if __name__ == "__main__" and len(sys.argv) > 1:
-        if sys.argv[1] == "help":
-            print("USAGE: lanlogin.exe [login/logout]")
-            sys.exit()
-        elif sys.argv[1] == "login":
-            root.after(300, login_btn)
-            root.after(2000, root.destroy)
-        elif sys.argv[1] == "logout":
-            root.after(300, logout_btn)
-            root.after(2000, root.destroy)
-        else:
-            print("Invalid command line argument")
-            sys.exit()
-
     # 设置字体
     style = ttk.Style()
     style.configure("TEntry", font=("Microsoft YaHei UI", 10))
