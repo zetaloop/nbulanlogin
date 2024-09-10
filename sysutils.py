@@ -1,5 +1,7 @@
 import os, sys
 
+icon = None
+
 
 def hide_console():
     """隐藏命令行窗口"""
@@ -11,6 +13,21 @@ def hide_console():
         if hwnd != 0:
             ctypes.windll.user32.ShowWindow(hwnd, 0)
             ctypes.windll.kernel32.CloseHandle(hwnd)
+
+
+def show_console():
+    """显示命令行窗口"""
+    if sys.platform == "win32":
+        import ctypes
+
+        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if hwnd != 0:
+            ctypes.windll.user32.ShowWindow(hwnd, 1)
+            ctypes.windll.kernel32.CloseHandle(hwnd)
+
+
+def win32_set_icon(root):
+    root.iconbitmap("lanlogin.ico")
 
 
 def win32_create_startup():
@@ -74,6 +91,7 @@ def darwin_create_startup():
     )
     if os.path.exists(plist_path):
         os.remove(plist_path)
+    os.makedirs(os.path.dirname(plist_path), exist_ok=True)
     with open(plist_path, "w") as plist_file:
         plist_file.write(PLIST_TEMPLATE.format(target_path=target_path))
     os.system(f"launchctl load {plist_path}")
@@ -110,6 +128,7 @@ def linux_create_startup():
     systemd_path = os.path.expanduser("~/.config/systemd/user/nbulanlogin.service")
     if os.path.exists(systemd_path):
         os.remove(systemd_path)
+    os.makedirs(os.path.dirname(systemd_path), exist_ok=True)
     with open(systemd_path, "w") as systemd_file:
         systemd_file.write(SYSTEMD_TEMPLATE.format(target_path=target_path))
     os.system(f"systemctl --user enable nbulanlogin.service")
@@ -129,8 +148,17 @@ def linux_remove_startup():
         return "未找到 systemd 开机自启服务"
 
 
+def default_set_icon(root):
+    global icon
+    if icon is None:
+        import tkinter as tk
+
+        icon = tk.PhotoImage(file="lanlogin.png")
+    root.iconphoto(True, icon)
+
+
 def default_create_startup():
-    from tkinter import messagebox  # type: ignore
+    from tkinter import messagebox
 
     messagebox.showwarning(
         "开机自启暂不支持",
@@ -143,8 +171,12 @@ def default_remove_startup():
     return None
 
 
+set_icon = default_set_icon
+create_startup = default_create_startup
+remove_startup = default_remove_startup
 match sys.platform:
     case "win32":
+        set_icon = win32_set_icon
         create_startup = win32_create_startup
         remove_startup = win32_remove_startup
     case "darwin":
@@ -153,6 +185,3 @@ match sys.platform:
     case "linux":
         create_startup = linux_create_startup
         remove_startup = linux_remove_startup
-    case default:
-        create_startup = default_create_startup
-        remove_startup = default_remove_startup

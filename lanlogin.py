@@ -1,6 +1,12 @@
 import os, sys, time, webbrowser
 from core import getstate, login, logout
-from sysutils import hide_console, create_startup, remove_startup
+from sysutils import (
+    set_icon,
+    show_console,
+    hide_console,
+    create_startup,
+    remove_startup,
+)
 from cli import cli
 from config import get, set
 from version import vertxt
@@ -73,7 +79,7 @@ def settings_btn():
     settings = tk.Toplevel(root)
     settings.withdraw()
     settings.title("设置")
-    settings.iconbitmap("lanlogin.ico")
+    set_icon(settings)
     settings.resizable(False, False)
     settings.bind("<Control-w>", lambda _: settings.destroy())
     settings.bind("<Escape>", lambda _: settings.destroy())
@@ -268,7 +274,8 @@ def ui():
     root = tk.Tk()
     root.withdraw()
     root.title("宁大宽带登录器")
-    root.iconbitmap("lanlogin.ico")
+    set_icon(root)
+
     root.resizable(False, False)
     root.bind("<Control-w>", lambda e: root.destroy())
     root.bind("<Escape>", lambda e: root.destroy())
@@ -361,4 +368,8 @@ if __name__ == "__main__":
         cli()
     else:
         hide_console()
-        ui()
+        try:
+            ui()
+        except Exception as error:
+            show_console()
+            raise error
