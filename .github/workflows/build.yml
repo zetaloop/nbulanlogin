@@ -7,37 +7,85 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [
+            ubuntu-latest,
+            macos-latest, # arm64
+            macos-latest-large, # x86_64
+            windows-latest,
+          ]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-    - name: Make build scripts executable (Linux/macOS)
-      if: runner.os != 'Windows'
-      run: chmod +x buildtools/build_macos.sh buildtools/build_linux.sh
+      - name: Make build scripts executable (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: chmod +x buildtools/build_macos.sh buildtools/build_linux.sh
 
-    - name: Run build script on Windows
-      if: runner.os == 'Windows'
-      run: buildtools\build_win.cmd
+      - name: Run build script on Windows
+        if: runner.os == 'Windows'
+        run: buildtools\build_win.cmd # -> buildtools\lanlogin.exe
 
-    - name: Run build script on macOS
-      if: runner.os == 'macOS'
-      run: ./buildtools/build_macos.sh
+      - name: Run build script on macOS
+        if: runner.os == 'macOS'
+        run: ./buildtools/build_macos.sh # -> buildtools/lanlogin, both arm64 and x86_64
 
-    - name: Run build script on Linux
-      if: runner.os == 'Linux'
-      run: ./buildtools/build_linux.sh
+      - name: Run build script on Linux
+        if: runner.os == 'Linux'
+        run: ./buildtools/build_linux.sh # -> buildtools/lanlogin
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: lanlogin-${{ runner.os }}
-        path: buildtools/lanlogin*
+      - name: Set artifact name
+        # lanlogin-{runner.os}-{arm64/x64}
+        shell: bash
+        run: |
+          if [[ ${{ runner.os }} == 'macOS' ]]; then
+            if [[ ${{ matrix.os }} == 'macos-latest' ]]; then
+              echo "ARTIFACT_NAME=lanlogin-macOS-arm64" >> $GITHUB_ENV
+            else
+              echo "ARTIFACT_NAME=lanlogin-macOS-x64" >> $GITHUB_ENV
+            fi
+          else
+            echo "ARTIFACT_NAME=lanlogin-${{ runner.os }}-x64" >> $GITHUB_ENV
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: buildtools/lanlogin*
+
+  create-universal-binary:
+    needs: build
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download arm64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: lanlogin-macOS-arm64
+          path: buildtools/arm64
+
+      - name: Download x86_64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: lanlogin-macOS-x64
+          path: buildtools/x64
+
+      - name: Create Universal Binary
+        run: |
+          lipo -create buildtools/arm64/lanlogin buildtools/x64/lanlogin -output buildtools/lanlogin
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lanlogin-macOS-universal
+          path: buildtools/lanlogin
