@@ -14,21 +14,11 @@ pip install -U requests sv_ttk pyinstaller
 pyinstaller --onefile --icon=../lanlogin.png --add-data "../lanlogin.png:." --collect-data sv_ttk --distpath . --workpath build ../lanlogin.py
 
 # Clean trash
-if [ -d "venv" ]; then
-    rm -rf venv
-fi
-if [ -d "dist" ]; then
-    rm -rf dist
-fi
-if [ -d "build" ]; then
-    rm -rf build
-fi
-if [ -d "__pycache__" ]; then
-    rm -rf __pycache__
-fi
-if [ -f "lanlogin.spec" ]; then
-    rm lanlogin.spec
-fi
+[ -d "venv" ] && rm -rf venv
+[ -d "dist" ] && rm -rf dist
+[ -d "build" ] && rm -rf build
+[ -d "__pycache__" ] && rm -rf __pycache__
+[ -f "lanlogin.spec" ] && rm lanlogin.spec
 
 echo
 echo "Build completed."
