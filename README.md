@@ -7,14 +7,13 @@
 - 一键登录和退出
 - 记住账号密码
 - 开机启动
-- 打开软件自动登录
-- 定时退出重新登录
+- 定时退出重登
 - 支持命令行参数
-- 全平台源码与二进制打包
+- 跨平台
 
 ## 下载
 
-单文件打包 Windows / Linux / macOS
+单文件打包 [Windows / Linux / macOS] * [x64 / arm64]
 
 v3.1 20250511 [点击前往发行版下载](https://github.com/zetaloop/nbulanlogin/releases/latest)
 
