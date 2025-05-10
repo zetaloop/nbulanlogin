@@ -16,7 +16,7 @@
 
 单文件打包 Windows / Linux / macOS
 
-v3.0 20240911 [点击前往发行版下载](https://github.com/zetaloop/nbulanlogin/releases/latest)
+v3.1 20250511 [点击前往发行版下载](https://github.com/zetaloop/nbulanlogin/releases/latest)
 
 ## 使用源代码
 ### Python 依赖库

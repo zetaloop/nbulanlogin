@@ -1,4 +1,4 @@
-ver = [3.0]
+ver = [3.1]
 vertxt = "v" + ".".join(map(str, ver))
 
 """
@@ -56,4 +56,9 @@ VERSION LOG
     统一入口程序
     添加 Linux macOS 完整支持
     全平台 GitHub Actions 自动构建
+
+3.1 20250511
+    修复 macOS x64 构建
+    增加 Linux arm64 构建
+    增加 Windows arm64 构建
 """
