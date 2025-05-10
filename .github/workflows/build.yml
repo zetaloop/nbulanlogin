@@ -10,12 +10,16 @@ jobs:
         include:
           - os: ubuntu-24.04
             arch: x64
-          - os: macos-15
+          - os: ubuntu-24.04-arm
             arch: arm64
           - os: macos-15
             arch: x64
+          - os: macos-15
+            arch: arm64
           - os: windows-2025
             arch: x64
+          - os: windows-11-arm
+            arch: arm64
 
     runs-on: ${{ matrix.os }}
 
@@ -23,8 +27,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Rosetta for macOS
-        if: runner.os == 'macOS'
+      - name: Setup Rosetta for macOS x64
+        if: runner.os == 'macOS' && matrix.arch == 'x64'
         run: |
           sudo softwareupdate --install-rosetta --agree-to-license
 
@@ -42,11 +46,11 @@ jobs:
         if: runner.os == 'Windows'
         run: buildtools\build_win.cmd # -> buildtools\lanlogin.exe
 
-      - name: Run build script on macOS arm64
+      - name: Run build script on macOS
         if: runner.os == 'macOS' && matrix.arch == 'arm64'
         run: ./buildtools/build_macos.sh # -> buildtools/lanlogin
 
-      - name: Run build script on macOS x64
+      - name: Run build script on macOS Rosetta
         if: runner.os == 'macOS' && matrix.arch == 'x64'
         run: arch -x86_64 ./buildtools/build_macos.sh # -> buildtools/lanlogin
 
