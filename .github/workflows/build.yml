@@ -8,10 +8,10 @@ jobs:
     strategy:
       matrix:
         os: [
-            ubuntu-latest,
-            macos-latest, # arm64
-            macos-13, # x86_64
-            windows-latest,
+            ubuntu-24.04,
+            macos-15, # arm64
+            macos-15-large, # x86_64
+            windows-2025,
           ]
 
     runs-on: ${{ matrix.os }}
@@ -23,7 +23,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.13"
 
       - name: Make build scripts executable (Linux/macOS)
         if: runner.os != 'Windows'
@@ -46,7 +46,7 @@ jobs:
         shell: bash
         run: |
           if [[ ${{ runner.os }} == 'macOS' ]]; then
-            if [[ ${{ matrix.os }} == 'macos-latest' ]]; then
+            if [[ ${{ matrix.os }} == 'macos-15' ]]; then
               echo "ARTIFACT_NAME=lanlogin-macOS-arm64" >> $GITHUB_ENV
             else
               echo "ARTIFACT_NAME=lanlogin-macOS-x64" >> $GITHUB_ENV
@@ -63,7 +63,7 @@ jobs:
 
   create-universal-binary:
     needs: build
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
