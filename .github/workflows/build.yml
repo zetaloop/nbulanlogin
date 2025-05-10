@@ -7,12 +7,19 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [
-            ubuntu-latest,
-            macos-latest, # arm64
-            macos-13, # x86_64
-            windows-latest,
-          ]
+        include:
+          - os: ubuntu-24.04
+            arch: x64
+          - os: ubuntu-24.04-arm
+            arch: arm64
+          - os: macos-15
+            arch: x64
+          - os: macos-15
+            arch: arm64
+          - os: windows-2025
+            arch: x64
+          - os: windows-11-arm
+            arch: arm64
 
     runs-on: ${{ matrix.os }}
 
@@ -20,10 +27,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Rosetta for macOS x64
+        if: runner.os == 'macOS' && matrix.arch == 'x64'
+        run: |
+          sudo softwareupdate --install-rosetta --agree-to-license
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.13"
+          architecture: ${{ matrix.arch }}
 
       - name: Make build scripts executable (Linux/macOS)
         if: runner.os != 'Windows'
@@ -34,36 +47,26 @@ jobs:
         run: buildtools\build_win.cmd # -> buildtools\lanlogin.exe
 
       - name: Run build script on macOS
-        if: runner.os == 'macOS'
-        run: ./buildtools/build_macos.sh # -> buildtools/lanlogin, both arm64 and x86_64
+        if: runner.os == 'macOS' && matrix.arch == 'arm64'
+        run: ./buildtools/build_macos.sh # -> buildtools/lanlogin
+
+      - name: Run build script on macOS Rosetta
+        if: runner.os == 'macOS' && matrix.arch == 'x64'
+        run: arch -x86_64 ./buildtools/build_macos.sh # -> buildtools/lanlogin
 
       - name: Run build script on Linux
         if: runner.os == 'Linux'
         run: ./buildtools/build_linux.sh # -> buildtools/lanlogin
 
-      - name: Set artifact name
-        # lanlogin-{runner.os}-{arm64/x64}
-        shell: bash
-        run: |
-          if [[ ${{ runner.os }} == 'macOS' ]]; then
-            if [[ ${{ matrix.os }} == 'macos-latest' ]]; then
-              echo "ARTIFACT_NAME=lanlogin-macOS-arm64" >> $GITHUB_ENV
-            else
-              echo "ARTIFACT_NAME=lanlogin-macOS-x64" >> $GITHUB_ENV
-            fi
-          else
-            echo "ARTIFACT_NAME=lanlogin-${{ runner.os }}-x64" >> $GITHUB_ENV
-          fi
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARTIFACT_NAME }}
+          name: lanlogin-${{ runner.os }}-${{ matrix.arch }}
           path: buildtools/lanlogin*
 
   create-universal-binary:
     needs: build
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -74,7 +77,7 @@ jobs:
           name: lanlogin-macOS-arm64
           path: buildtools/arm64
 
-      - name: Download x86_64 artifact
+      - name: Download x64 artifact
         uses: actions/download-artifact@v4
         with:
           name: lanlogin-macOS-x64
